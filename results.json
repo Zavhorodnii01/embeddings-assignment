@@ -1,0 +1,64 @@
+{
+  "cross_context_similarity": {
+    "word2vec": {
+      "bank": 1.0,
+      "discharge": 1.0,
+      "lead": 1.0,
+      "cold": 1.0
+    },
+    "transformer": {
+      "bank": 0.9942,
+      "discharge": 0.9716,
+      "lead": 0.9561,
+      "cold": 0.9808
+    }
+  },
+  "sentence_similarity": {
+    "paraphrase (medical)": {
+      "word2vec": 0.9565,
+      "transformer": 0.9959
+    },
+    "paraphrase (finance)": {
+      "word2vec": 0.9525,
+      "transformer": 0.9513
+    },
+    "unrelated": {
+      "word2vec": 0.9005,
+      "transformer": 0.9475
+    },
+    "paraphrase (toxicology)": {
+      "word2vec": 0.955,
+      "transformer": 0.9649
+    },
+    "paraphrase (virology)": {
+      "word2vec": 0.9575,
+      "transformer": 0.983
+    },
+    "partial overlap": {
+      "word2vec": 0.9074,
+      "transformer": 0.9647
+    }
+  },
+  "negation_robustness": {
+    "pair_1": {
+      "word2vec": 0.9922,
+      "transformer": 0.9839
+    },
+    "pair_2": {
+      "word2vec": 0.9903,
+      "transformer": 0.9906
+    },
+    "pair_3": {
+      "word2vec": 0.9871,
+      "transformer": 0.9814
+    },
+    "pair_4": {
+      "word2vec": 0.9948,
+      "transformer": 0.9921
+    },
+    "pair_5": {
+      "word2vec": 0.9964,
+      "transformer": 0.9917
+    }
+  }
+}
