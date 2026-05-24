@@ -1,10 +1,3 @@
-"""
-Medical Informatics Assignment – Topic 2: Transformers vs. word2vec
-Authors: Nazarii Zavhorodnii, Karol Piglowski
-
-This script produces all figures and numeric results used in the final PDF report.
-Everything is computed from scratch – no pre-fabricated results.
-"""
 
 import os
 import warnings
@@ -26,15 +19,10 @@ import random
 random.seed(42)
 np.random.seed(42)
 
-# Save all outputs next to this script file
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "")
 os.makedirs(OUT, exist_ok=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 1. CORPUS  (hand-crafted; covers polysemous words in both contexts)
-# ─────────────────────────────────────────────────────────────────────────────
 CORPUS_RAW = [
-    # ── BANK: financial
     "the bank approved the mortgage application", "she deposited money at the bank",
     "the bank manager called about the loan", "he withdrew cash from the bank",
     "the bank offers low interest rates", "the central bank raised interest rates",
@@ -45,7 +33,6 @@ CORPUS_RAW = [
     "the bank vault stores gold reserves", "her bank balance increased significantly",
     "the bank declined the loan request", "the regional bank opened new branches",
     "online banking replaced visits to the bank", "the bank reported record profits",
-    # ── BANK: river / physical
     "we sat on the river bank watching fish", "the flood destroyed the bank of the river",
     "wildflowers grew along the bank of the stream", "children played on the muddy river bank",
     "the bank of the canal was overgrown with reeds", "the fisherman sat on the steep river bank",
@@ -56,7 +43,6 @@ CORPUS_RAW = [
     "the steep bank made fishing difficult", "deer drank from the bank of the stream",
     "the bank of the river was frozen in winter", "trees lined the opposite bank of the river",
     "the bank of the lake is protected wetland", "she walked along the bank of the river",
-    # ── DISCHARGE: medical
     "the patient received a hospital discharge after surgery", "discharge papers were signed by the doctor",
     "the nurse prepared the discharge summary", "early discharge is recommended for stable patients",
     "hospital discharge planning reduces readmission", "the patient was given a discharge diagnosis",
@@ -65,7 +51,6 @@ CORPUS_RAW = [
     "the patient refused discharge from the ward", "delayed discharge leads to bed shortages",
     "the discharge letter was sent to the general practitioner", "post discharge follow up is essential",
     "the patient was awaiting discharge for two days", "elective discharge occurred on monday morning",
-    # ── DISCHARGE: electrical / physical
     "the electrical discharge caused a fire", "static discharge damaged the circuit board",
     "lightning is a form of electrical discharge", "the capacitor discharge was measured in microseconds",
     "the battery discharge rate affects performance", "arc discharge produces intense light",
@@ -74,7 +59,6 @@ CORPUS_RAW = [
     "a sudden discharge of electricity occurred", "the discharge of static electricity shocked him",
     "electrostatic discharge can destroy microchips", "the discharge rate of the battery was low",
     "the high voltage discharge was visible", "the discharge of energy lit up the room",
-    # ── LEAD: chemical / toxic
     "lead exposure causes serious neurological damage", "children are most vulnerable to lead poisoning",
     "lead paint was banned due to health risks", "high blood lead levels impair cognition",
     "lead is a heavy toxic metal", "environmental lead contamination is widespread",
@@ -83,14 +67,12 @@ CORPUS_RAW = [
     "the child had elevated blood lead levels", "lead poisoning symptoms include fatigue",
     "drinking water contaminated with lead is dangerous", "the old paint chips contained lead",
     "workers were exposed to lead dust", "lead shields protect against radiation",
-    # ── LEAD: medical instrument / ECG
     "the doctor attached the lead to the patient chest", "the twelve lead ECG showed abnormalities",
     "the cardiologist examined the precordial lead", "lead two showed st elevation",
     "the ECG lead fell off during the procedure", "the nurse placed the chest lead correctly",
     "the augmented lead avr showed changes", "the limb lead detected arrhythmia",
     "the ECG lead placement follows standard protocol", "the precordial lead showed right bundle branch block",
     "the lead wire connects the electrode to the monitor", "an ECG lead records electrical activity",
-    # ── COLD: temperature
     "the weather is very cold today", "she wrapped herself in a blanket because it was cold",
     "the cold wind made walking unpleasant", "the river water was ice cold in winter",
     "cold temperatures froze the pipes", "the cold snap lasted for a week",
@@ -99,7 +81,6 @@ CORPUS_RAW = [
     "the cold winter reduced crop yields", "the cold climate requires special clothing",
     "the cold ocean current affects the local climate", "the night was extremely cold",
     "cold storage keeps food fresh", "the cold snap killed the crops",
-    # ── COLD: illness / infection
     "she caught a cold last week", "the cold kept him home from work",
     "the common cold is caused by rhinovirus", "he had a runny nose from the cold",
     "the cold spread quickly through the office", "she recovered from the cold in three days",
@@ -108,7 +89,6 @@ CORPUS_RAW = [
     "the cold virus spreads through droplets", "he developed a cold after the conference",
     "the cold left him with a persistent cough", "the cold season peaks in winter months",
     "the cold spread from her child to the whole family", "antibiotics do not treat a cold",
-    # ── General medical / biological background sentences
     "the doctor examined the patient carefully", "the nurse administered the medication",
     "the hospital admitted ten new patients", "the surgeon performed the operation successfully",
     "the laboratory analyzed the blood sample", "the diagnosis was confirmed by imaging",
@@ -119,7 +99,6 @@ CORPUS_RAW = [
     "the respiratory system provides oxygen", "the endocrine system regulates hormones",
     "the digestive system processes nutrients", "the skeletal system supports the body",
     "the musculoskeletal system enables movement", "the renal system filters waste",
-    # ── General language background
     "the scientist published important research", "the student studied late into the night",
     "the teacher explained the concept clearly", "the engineer designed a new system",
     "the computer program processed the data", "the algorithm found the optimal solution",
@@ -134,9 +113,6 @@ CORPUS = [s.lower().split() for s in CORPUS_RAW]
 
 print(f"Corpus: {len(CORPUS)} sentences, {sum(len(s) for s in CORPUS)} tokens")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 2. TRAIN WORD2VEC
-# ─────────────────────────────────────────────────────────────────────────────
 print("\n--- Training Word2Vec ---")
 w2v = Word2Vec(
     sentences=CORPUS,
@@ -149,7 +125,6 @@ w2v = Word2Vec(
 )
 print(f"Vocabulary size: {len(w2v.wv)}")
 
-# Helper
 def w2v_vec(word):
     return w2v.wv[word]
 
@@ -157,9 +132,6 @@ def cosine_sim(a, b):
     a, b = np.array(a), np.array(b)
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-12))
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3. MINIMAL TRANSFORMER ENCODER (pure numpy)
-# ─────────────────────────────────────────────────────────────────────────────
 print("\n--- Building Transformer ---")
 
 DIM = 64   # must match word2vec dim for fair comparison
@@ -178,13 +150,11 @@ def positional_encoding(seq_len, d_model):
     PE[:, 1::2] = np.cos(pos * div)
     return PE
 
-# Projection matrices (fixed random, simulating learned weights)
 rng = np.random.RandomState(0)
 Wq = rng.randn(DIM, DIM) * 0.1
 Wk = rng.randn(DIM, DIM) * 0.1
 Wv = rng.randn(DIM, DIM) * 0.1
 Wo = rng.randn(DIM, DIM) * 0.1
-# Feed-forward
 Wff1 = rng.randn(DIM, DIM * 4) * 0.1
 Wff2 = rng.randn(DIM * 4, DIM) * 0.1
 
@@ -199,7 +169,6 @@ def multi_head_attention(X):
     Q = X @ Wq
     K = X @ Wk
     V = X @ Wv
-    # Split heads
     Q_h = Q.reshape(seq_len, NUM_HEADS, HEAD_DIM).transpose(1, 0, 2)  # (h, s, d)
     K_h = K.reshape(seq_len, NUM_HEADS, HEAD_DIM).transpose(1, 0, 2)
     V_h = V.reshape(seq_len, NUM_HEADS, HEAD_DIM).transpose(1, 0, 2)
@@ -208,7 +177,6 @@ def multi_head_attention(X):
     attn = weights @ V_h  # (h, s, d)
     attn = attn.transpose(1, 0, 2).reshape(seq_len, DIM)  # (s, dim)
     out = attn @ Wo
-    # avg weights across heads for visualisation
     avg_weights = weights.mean(axis=0)
     return out, avg_weights
 
@@ -221,7 +189,6 @@ def transformer_encode(sentence_tokens):
     Returns (contextual_embeddings, attention_weights)
     contextual_embeddings: (seq_len, DIM)
     """
-    # 1. Token embeddings from word2vec
     vecs = []
     for tok in sentence_tokens:
         if tok in w2v.wv:
@@ -229,13 +196,10 @@ def transformer_encode(sentence_tokens):
         else:
             vecs.append(rng.randn(DIM) * 0.01)
     X = np.array(vecs)                           # (seq, DIM)
-    # 2. Add positional encoding
     X = X + positional_encoding(len(X), DIM)
     X = layer_norm(X)
-    # 3. Self-attention
     attn_out, attn_weights = multi_head_attention(X)
     X = layer_norm(X + attn_out)
-    # 4. Feed-forward
     ff_out = feed_forward(X)
     X = layer_norm(X + ff_out)
     return X, attn_weights
@@ -247,9 +211,6 @@ def get_contextual_vec(sentence_tokens, target_word):
         return None, None, None
     return embs[idx], weights[idx], idx
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 4. EXAMPLE SENTENCES
-# ─────────────────────────────────────────────────────────────────────────────
 examples = {
     "bank": {
         "financial": [
@@ -301,9 +262,6 @@ examples = {
     },
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 5. COMPUTE EMBEDDINGS FOR ALL EXAMPLES
-# ─────────────────────────────────────────────────────────────────────────────
 print("\n--- Computing contextual embeddings ---")
 
 results = {}
@@ -314,10 +272,8 @@ for word, contexts in examples.items():
         tf_vecs  = []
         for sent in sentences:
             tokens = sent.lower().split()
-            # word2vec – same static vector every time
             if word in tokens and word in w2v.wv:
                 w2v_vecs.append(w2v_vec(word))
-            # transformer – context-dependent
             tv, _, _ = get_contextual_vec(tokens, word)
             if tv is not None:
                 tf_vecs.append(tv)
@@ -326,9 +282,6 @@ for word, contexts in examples.items():
             "tf":  np.array(tf_vecs),
         }
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 6. FIGURE 1 – COSINE SIMILARITY HEATMAP (word2vec vs transformer)
-# ─────────────────────────────────────────────────────────────────────────────
 print("--- Figure 1: Cosine similarity heatmap ---")
 
 fig, axes = plt.subplots(2, 4, figsize=(16, 7))
@@ -338,7 +291,6 @@ fig.suptitle("Cosine Similarity: same word in different contexts\n"
 
 for col_i, (word, contexts) in enumerate(results.items()):
     ctx_names = list(contexts.keys())
-    # Gather all vectors for each model
     for row_i, model_key in enumerate(["w2v", "tf"]):
         ax = axes[row_i][col_i]
         all_vecs = []
@@ -350,7 +302,6 @@ for col_i, (word, contexts) in enumerate(results.items()):
                 labels.append(f"{ctx[:3]}-{j+1}")
         mat = cosine_similarity(np.array(all_vecs))
         n = len(contexts[ctx_names[0]][model_key])
-        # Draw dividing line between contexts
         for boundary in range(n, len(all_vecs), n):
             ax.axhline(boundary - 0.5, color="white", lw=2)
             ax.axvline(boundary - 0.5, color="white", lw=2)
@@ -373,9 +324,6 @@ plt.savefig(f"{OUT}fig1_similarity_heatmap.png", dpi=150, bbox_inches="tight")
 plt.close()
 print("  saved fig1")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 7. FIGURE 2 – CROSS-CONTEXT SIMILARITY BAR CHART
-# ─────────────────────────────────────────────────────────────────────────────
 print("--- Figure 2: Cross-context similarity bars ---")
 
 cross_sims_w2v = {}
@@ -388,7 +336,6 @@ for word, contexts in results.items():
     vecs_b_w2v = contexts[ctx_b]["w2v"]
     vecs_a_tf  = contexts[ctx_a]["tf"]
     vecs_b_tf  = contexts[ctx_b]["tf"]
-    # Average vector per context
     mu_a_w2v = vecs_a_w2v.mean(0)
     mu_b_w2v = vecs_b_w2v.mean(0)
     mu_a_tf  = vecs_a_tf.mean(0)
@@ -425,9 +372,6 @@ plt.savefig(f"{OUT}fig2_cross_context_similarity.png", dpi=150, bbox_inches="tig
 plt.close()
 print("  saved fig2")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 8. FIGURE 3 – ATTENTION WEIGHTS FOR "BANK"
-# ─────────────────────────────────────────────────────────────────────────────
 print("--- Figure 3: Attention weights ---")
 
 bank_sentences = {
@@ -443,7 +387,6 @@ fig.suptitle('Self-attention weights for "bank" in two different contexts\n'
 for ax, (ctx_label, sent) in zip(axes, bank_sentences.items()):
     tokens = sent.lower().split()
     _, attn_w, idx = get_contextual_vec(tokens, "bank")
-    # attn_w is the attention distribution FROM "bank" TO all tokens
     bar_colors = ["#E07B54" if i == idx else "#5B9BD5" for i in range(len(tokens))]
     ax.bar(range(len(tokens)), attn_w, color=bar_colors, edgecolor="white", linewidth=0.5)
     ax.set_xticks(range(len(tokens)))
@@ -451,7 +394,6 @@ for ax, (ctx_label, sent) in zip(axes, bank_sentences.items()):
     ax.set_ylabel("Attention weight", fontsize=10)
     ax.set_title(ctx_label, fontsize=11, fontweight="bold")
     ax.set_ylim(0, max(attn_w) * 1.3)
-    # Mark target word
     ax.get_xticklabels()[idx].set_color("#E07B54")
     ax.get_xticklabels()[idx].set_fontweight("bold")
 
@@ -460,12 +402,8 @@ plt.savefig(f"{OUT}fig3_attention_weights.png", dpi=150, bbox_inches="tight")
 plt.close()
 print("  saved fig3")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 9. FIGURE 4 – PCA: WORD2VEC STATIC VS TRANSFORMER CONTEXTUAL
-# ─────────────────────────────────────────────────────────────────────────────
 print("--- Figure 4: PCA visualisation ---")
 
-# Build PCA data for "discharge"
 pca_words = ["discharge", "lead", "bank", "cold"]
 pca_sentences = {
     "discharge_medical":    "the patient received a hospital discharge after surgery",
@@ -526,7 +464,6 @@ for ax, coords, title in [(ax1, w2v_2d, "Word2Vec (static)"), (ax2, tf_2d, "Tran
         ax.annotate(lbl.replace("_", "\n"),
                     (coords[i, 0], coords[i, 1]),
                     textcoords="offset points", xytext=(6, 6), fontsize=7)
-    # Draw lines between same-word pairs
     words_to_connect = pca_words
     for wd in words_to_connect:
         idxs = [j for j, l in enumerate(pca_labels) if l.startswith(wd + "_")]
@@ -539,7 +476,6 @@ for ax, coords, title in [(ax1, w2v_2d, "Word2Vec (static)"), (ax2, tf_2d, "Tran
     ax.set_ylabel("PC2", fontsize=10)
     ax.grid(True, alpha=0.3)
 
-# Legend
 from matplotlib.lines import Line2D
 legend_elements = [
     Line2D([0],[0], marker="o", color="w", markerfacecolor=color_map[wd],
@@ -556,9 +492,6 @@ plt.savefig(f"{OUT}fig4_pca.png", dpi=150, bbox_inches="tight")
 plt.close()
 print("  saved fig4")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 10. FIGURE 5 – SENTENCE SIMILARITY COMPARISON
-# ─────────────────────────────────────────────────────────────────────────────
 print("--- Figure 5: Sentence similarity ---")
 
 sentence_pairs = [
@@ -609,9 +542,6 @@ plt.savefig(f"{OUT}fig5_sentence_similarity.png", dpi=150, bbox_inches="tight")
 plt.close()
 print("  saved fig5")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 11. FIGURE 6 – NEGATIVE EXAMPLE: WORD2VEC FAILS ON NEGATION
-# ─────────────────────────────────────────────────────────────────────────────
 print("--- Figure 6: Negative example – negation ---")
 
 negation_pairs = [
@@ -653,9 +583,6 @@ plt.savefig(f"{OUT}fig6_negation.png", dpi=150, bbox_inches="tight")
 plt.close()
 print("  saved fig6")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 12. FIGURE 7 – MOST SIMILAR WORDS (word2vec intrinsic evaluation)
-# ─────────────────────────────────────────────────────────────────────────────
 print("--- Figure 7: Most similar words ---")
 
 target_words = ["discharge", "lead", "bank", "cold"]
@@ -685,9 +612,6 @@ plt.savefig(f"{OUT}fig7_most_similar.png", dpi=150, bbox_inches="tight")
 plt.close()
 print("  saved fig7")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 13. SAVE NUMERIC RESULTS AS JSON (for report tables)
-# ─────────────────────────────────────────────────────────────────────────────
 numeric_results = {
     "cross_context_similarity": {
         "word2vec": {k: round(float(v), 4) for k, v in cross_sims_w2v.items()},
